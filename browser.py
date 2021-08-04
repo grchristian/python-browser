@@ -1,52 +1,65 @@
+# se importan las librerías a utilizar
 import sys
-from PyQt5.QtCore import *
-from PyQt5.QtWidgets import *
-from PyQt5.QtWebEngineWidgets import *
+from PyQt5.QtCore import QUrl
+from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLineEdit
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWebEngineWidgets import QWebEngineView
 
-class MainWindow(QMainWindow):
+class Widgets(QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
-        self.browser = QWebEngineView()
-        self.browser.setUrl(QUrl('https://www.google.com.mx/'))
-        self.setCentralWidget(self.browser)
-        self.showMaximized()
-
-        #navbar
-        navbar = QToolBar()
-        self.addToolBar(navbar)
-
-        back_btn = QAction('Back',self)
-        back_btn.triggered.connect(self.browser.back)
-        navbar.addAction(back_btn)
-
-        forward_btn = QAction('Forward',self)
-        forward_btn.triggered.connect(self.browser.forward)
-        navbar.addAction(forward_btn)
+        QMainWindow.__init__(self)
+        self.setWindowTitle("Christian Browser")
+        self.widget = QWidget(self)
         
-        reload_btn = QAction('Reload', self)
-        reload_btn = triggered.connect(self.browser.reload)
-        navbar.addAction(reload_btn)
-
-        home_btn = QAction('Home',self)
-        home_btn = triggered.connect(self.navigate_home)
-        navbar.addAction(home_btn)
-
-        self.url_bar = QLineEdit()
-        self.url_bar.returnPressed.connect(self.navigate_to_url)
-        navbar.addWidget(self.url_bar)
-        self.browser.urlChanged.connect(self.update_url)
-
-def navigate_home(self):
-    self.browser.setUrl(QUrl('https://www.google.com.mx/'))
-
-def navigate_to_url(self):
-    url = self.url_bar.text()
-    self.browser.setUrl(QUrl(url))
-
-def update_url(self, q):
-    self.url_bar.setText(q.toString())
-
-app = QApplication(sys.argv)
-QApplication.setApplicationName("Christian Browser")
-window = MainWindow()
-app.exec_()
+        # widget para el navegador
+        self.webview = QWebEngineView()
+        self.webview.load(QUrl("https://christiangr.me/"))
+        self.webview.urlChanged.connect(self.url_changed)
+        
+        # botón atrás
+        self.back_button = QPushButton("<")
+        self.back_button.clicked.connect(self.webview.back)
+        
+        # botón adelante
+        self.forward_button = QPushButton(">")
+        self.forward_button.clicked.connect(self.webview.forward)
+        
+        # botón actualizar
+        self.refresh_button = QPushButton("REFRESH")
+        self.refresh_button.clicked.connect(self.webview.reload)
+        
+        # barra de direcciones
+        self.url_text = QLineEdit()
+        
+        # botón go
+        self.go_button = QPushButton("GO")
+        self.go_button.clicked.connect(self.url_set)
+        
+        self.toplayout = QHBoxLayout()
+        self.toplayout.addWidget(self.back_button)
+        self.toplayout.addWidget(self.forward_button)
+        self.toplayout.addWidget(self.refresh_button)
+        self.toplayout.addWidget(self.url_text)
+        self.toplayout.addWidget(self.go_button)
+        
+        self.layout = QVBoxLayout()
+        self.layout.addLayout(self.toplayout)
+        self.layout.addWidget(self.webview)
+        
+        self.widget.setLayout(self.layout)
+        self.setCentralWidget(self.widget)
+    
+    def url_changed(self, url):
+        # actualiza la barra de direciones
+        self.url_text.setText(url.toString())
+    
+    def url_set(self):
+        # cargar la página de la barra de direciones
+        self.webview.setUrl(QUrl(self.url_text.text()))
+        
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = Widgets()
+    window.show()
+    sys.exit(app.exec_())
