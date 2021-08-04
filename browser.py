@@ -1,4 +1,7 @@
-# se importan las librerías a utilizar
+# EN EL TERMINAL
+# pip3 install PyQt5
+# pip3 install PyQtWebEngine
+
 import sys
 from PyQt5.QtCore import QUrl
 from PyQt5.QtWidgets import QApplication, QHBoxLayout, QLineEdit
